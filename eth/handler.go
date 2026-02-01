@@ -512,43 +512,42 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		}
 	}
 
-	for peer, hashes := range txset {
+	//-------test hyperbolic cost model command-------
+	/*for peer, hashes := range txset {
 		directCount += len(hashes)
 		peer.AsyncSendTransactions(hashes)
-	}
+	}*/
+	//-------end test hyperbolic cost model command-------
 
-	//-------test hyperbolic cost model-------
+	//-------test hyperbolic cost model
 	type peerHashes struct {
 		p      *ethPeer
 		hashes []common.Hash
 		cost   float64
 	}
 
-	var ordered []peerHashes
-	for peer, hashes := range annos {
+	var orderedDirect []peerHashes
+	for peer, hashes := range txset {
 		id := peer.Peer.Node().ID()
-		ordered = append(ordered, peerHashes{
-			p: peer, hashes: hashes,
-			cost: h.costModel.Cost(id),
+		orderedDirect = append(orderedDirect, peerHashes{
+			p:      peer,
+			hashes: hashes,
+			cost:   h.costModel.Cost(id),
 		})
 	}
 
-	sort.Slice(ordered, func(i, j int) bool {
-		return ordered[i].cost < ordered[j].cost
+	sort.Slice(orderedDirect, func(i, j int) bool {
+		return orderedDirect[i].cost < orderedDirect[j].cost
 	})
 
-	for i, item := range ordered {
-
-		if i < 5 {
-			log.Trace("announce order",
-				"rank", i,
-				"peer", item.p.Peer.Node().ID(),
-				"cost", item.cost,
-			)
-		}
-
-		annCount += len(item.hashes)
-		item.p.AsyncSendPooledTransactionHashes(item.hashes)
+	for _, item := range orderedDirect {
+		log.Trace("direct order",
+			"peer", item.p.Peer.Node().ID(),
+			"cost", item.cost,
+			"count", len(item.hashes),
+		)
+		directCount += len(item.hashes)
+		item.p.AsyncSendTransactions(item.hashes)
 	}
 
 	//-------end test hyperbolic cost model-------
