@@ -11,6 +11,12 @@
 
 ## 本地测试
 
+### 编译代码
+
+```bash
+make geth
+```
+
 ### 创造网络
 
 ```bash
@@ -52,14 +58,14 @@ eth.getBalance(eth.accounts[0])
 ```
 
 ```js
-admin.addPeer("")
+admin.addPeer("<上面的哈希值>")
 admin.peers.length
 ```
 
 ### make tx
 
-```js
-for (let i = 0; i < 30; i++) {eth.sendTransaction({from: eth.accounts[0],to: eth.accounts[0],value: 1})}
+```shell
+go run ./p2p/costspace/main/send-tx-batch.go
 ```
 
 ### stop the network
@@ -118,4 +124,3 @@ for (let i = 0; i < 30; i++) {eth.sendTransaction({from: eth.accounts[0],to: eth
   }
 }
 ```
-
