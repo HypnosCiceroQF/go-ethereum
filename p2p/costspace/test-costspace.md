@@ -13,7 +13,9 @@
 
 ### 创造网络
 
-`./p2p/costspace/start-hyperbolic-network.sh`
+```bash
+./p2p/costspace/start-hyperbolic-network.sh
+```
 
 ### node2js console
 
@@ -35,7 +37,7 @@ admin.nodeInfo.enode
 admin.nodeInfo.enode
 ```
 
-### node1 js console 
+### node1 js console
 
 ```shell
 ./build/bin/geth attach /tmp/geth1/geth.ipc
@@ -54,15 +56,17 @@ admin.addPeer("")
 admin.peers.length
 ```
 
-make tx
+### make tx
 
 ```js
 for (let i = 0; i < 30; i++) {eth.sendTransaction({from: eth.accounts[0],to: eth.accounts[0],value: 1})}
 ```
 
-stop the network
+### stop the network
 
-`./p2p/costspace/stop-network.sh`
+```bash
+./p2p/costspace/stop-network.sh
+```
 
 ## formate of the genesis.json
 
