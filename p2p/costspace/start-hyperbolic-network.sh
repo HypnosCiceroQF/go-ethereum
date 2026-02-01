@@ -112,10 +112,12 @@ echo "==> start 3 nodes in background (logs in $CLIQUE_DIR)"
 # node1: unlock signer + feeRecipient
 $GETH --datadir "$DATADIR1" --networkid "$NETWORKID" \
   --port "$P2P1" \
+  --nat extip:127.0.0.1 \
   --http --http.addr 127.0.0.1 --http.port "$HTTP1" --http.api admin,eth,net,web3,txpool \
   --authrpc.addr 127.0.0.1 --authrpc.port "$AUTH1" \
   --unlock "$ADDR_LC" --password "$PASSFILE" \
   --miner.pending.feeRecipient "$ADDR_LC" \
+  --nodiscover \
   --verbosity 5 >"$LOG1" 2>&1 &
 
 PID1=$!
@@ -123,15 +125,19 @@ PID1=$!
 # node2/node3: plain peers
 $GETH --datadir "$DATADIR2" --networkid "$NETWORKID" \
   --port "$P2P2" \
+  --nat extip:127.0.0.1 \
   --http --http.addr 127.0.0.1 --http.port "$HTTP2" --http.api admin,eth,net,web3,txpool \
   --authrpc.addr 127.0.0.1 --authrpc.port "$AUTH2" \
+  --nodiscover \
   --verbosity 5 >"$LOG2" 2>&1 &
 PID2=$!
 
 $GETH --datadir "$DATADIR3" --networkid "$NETWORKID" \
   --port "$P2P3" \
+  --nat extip:127.0.0.1 \
   --http --http.addr 127.0.0.1 --http.port "$HTTP3" --http.api admin,eth,net,web3,txpool \
   --authrpc.addr 127.0.0.1 --authrpc.port "$AUTH3" \
+  --nodiscover \
   --verbosity 5 >"$LOG3" 2>&1 &
 PID3=$!
 
