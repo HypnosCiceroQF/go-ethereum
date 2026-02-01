@@ -25,7 +25,7 @@ LOG3=$CLIQUE_DIR/node3.log
 echo "==> cleanup"
 rm -rf "$DATADIR1" "$DATADIR2" "$DATADIR3" "$CLIQUE_DIR"
 mkdir -p "$CLIQUE_DIR"
-: > "$PASSFILE"
+printf "\n" > "$PASSFILE"
 
 echo "==> create ONLY node1 account (empty password)"
 OUT="$($GETH account new --datadir "$DATADIR1" --password "$PASSFILE")"
