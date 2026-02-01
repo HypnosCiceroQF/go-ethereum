@@ -517,7 +517,7 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		peer.AsyncSendTransactions(hashes)
 	}
 
-	// -------test hyperbolic cost model-------
+	//-------test hyperbolic cost model-------
 	type peerHashes struct {
 		p      *ethPeer
 		hashes []common.Hash
@@ -551,7 +551,7 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		item.p.AsyncSendPooledTransactionHashes(item.hashes)
 	}
 
-	// -------end test hyperbolic cost model-------
+	//-------end test hyperbolic cost model-------
 
 	for peer, hashes := range annos {
 		annCount += len(hashes)
