@@ -23,6 +23,7 @@ import (
 	"maps"
 	"math"
 	"slices"
+	"sort"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -43,6 +44,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/costspace"
+	"github.com/ethereum/go-ethereum/p2p/costspace/hypermodel"
 	"github.com/ethereum/go-ethereum/p2p/enode"
 )
 
@@ -140,6 +143,10 @@ type handler struct {
 
 	handlerStartCh chan struct{}
 	handlerDoneCh  chan struct{}
+
+	//-------test hyperbolic cost model-------
+	costModel costspace.CostModel
+	//-------end test hyperbolic cost model-------
 }
 
 // newHandler returns a handler for all Ethereum chain management protocol.
@@ -161,6 +168,10 @@ func newHandler(config *handlerConfig) (*handler, error) {
 		quitSync:       make(chan struct{}),
 		handlerDoneCh:  make(chan struct{}),
 		handlerStartCh: make(chan struct{}),
+
+		//-------test hyperbolic cost model-------
+		costModel: hypermodel.New(),
+		//-------end test hyperbolic cost model-------
 	}
 	// Construct the downloader (long sync)
 	h.downloader = downloader.New(config.Database, config.Sync, h.eventMux, h.chain, h.removePeer, h.enableSyncedFeatures)
@@ -505,6 +516,34 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		directCount += len(hashes)
 		peer.AsyncSendTransactions(hashes)
 	}
+
+	// -------test hyperbolic cost model-------
+	type peerHashes struct {
+		p      *ethPeer
+		hashes []common.Hash
+		cost   float64
+	}
+
+	var ordered []peerHashes
+	for peer, hashes := range annos {
+		id := peer.Peer.Node().ID()
+		ordered = append(ordered, peerHashes{
+			p: peer, hashes: hashes,
+			cost: h.costModel.Cost(id),
+		})
+	}
+
+	sort.Slice(ordered, func(i, j int) bool {
+		return ordered[i].cost < ordered[j].cost
+	})
+
+	for _, item := range ordered {
+		annCount += len(item.hashes)
+		item.p.AsyncSendPooledTransactionHashes(item.hashes)
+	}
+
+	// -------end test hyperbolic cost model-------
+
 	for peer, hashes := range annos {
 		annCount += len(hashes)
 		peer.AsyncSendPooledTransactionHashes(hashes)
