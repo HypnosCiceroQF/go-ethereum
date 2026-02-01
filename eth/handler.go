@@ -537,13 +537,15 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
 		return ordered[i].cost < ordered[j].cost
 	})
 
-	for _, item := range ordered {
+	for i, item := range ordered {
 
-		log.Trace("announce order",
-			"peer", item.p.Peer.Node().ID(),
-			"cost", item.cost,
-			"txs", len(item.hashes),
-		)
+		if i < 5 {
+			log.Trace("announce order",
+				"rank", i,
+				"peer", item.p.Peer.Node().ID(),
+				"cost", item.cost,
+			)
+		}
 
 		annCount += len(item.hashes)
 		item.p.AsyncSendPooledTransactionHashes(item.hashes)
