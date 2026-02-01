@@ -1,0 +1,1 @@
+pkill -f "/tmp/geth[123]"
