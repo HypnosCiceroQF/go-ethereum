@@ -34,7 +34,8 @@ func (m *Model) Cost(peer enode.ID) float64 {
 	m.mu.RUnlock()
 	if !ok {
 		// 没坐标就给一个中性代价（别让它永远排最后导致永远不用）
-		return 1e9
+		// return 1e9
+		return float64(peer[0]) // 后续添加为TTP
 	}
 	// 这里先用“离中心的距离”作为 cost（越靠中心越优先）
 	// 后面你要“目标导向”再扩展
